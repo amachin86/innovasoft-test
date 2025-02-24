@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Checkbox, FormControlLabel, Container, Typography, Box, Alert } from '@mui/material';
 import axios from 'axios';
 
@@ -65,9 +65,10 @@ function LoginPage() {
         <Button fullWidth variant="contained" color="primary" onClick={handleLogin} sx={{ mt: 2 }}>
           Iniciar Sesión
         </Button>
-        <Button fullWidth variant="text" color="secondary" onClick={() => navigate('/register')} sx={{ mt: 1 }}>
-          ¿No tiene una cuenta? Regístrese
-        </Button>
+        <Typography variant="body2" align="center" style={{ marginTop: '16px' }} color="secondary">
+                ¿No tienes una cuenta?{' '}
+                <Link to="/register">Regístrate aquí</Link>
+        </Typography>
       </Box>
     </Container>
   );
