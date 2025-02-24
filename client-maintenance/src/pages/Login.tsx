@@ -47,14 +47,14 @@ function LoginPage() {
         {error && <Alert severity="error">{error}</Alert>}
         <TextField
           fullWidth
-          label="Usuario"
+          label="Usuario *"
           margin="normal"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
         <TextField
           fullWidth
-          label="Contraseña"
+          label="Contraseña *"
           margin="normal"
           type={showPassword ? 'text' : 'password'} // Cambia el tipo según el estado
           value={password}

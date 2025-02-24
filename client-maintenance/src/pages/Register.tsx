@@ -57,14 +57,14 @@ const RegisterPage: React.FC = () => {
         {success && <Alert severity="success">{success}</Alert>}
         <TextField
           fullWidth
-          label="Usuario"
+          label="Nombre Usuario *"
           margin="normal"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
         <TextField
           fullWidth
-          label="Correo Electrónico"
+          label="Correo Electrónico *"
           type="email"
           margin="normal"
           value={email}
@@ -73,7 +73,7 @@ const RegisterPage: React.FC = () => {
         <TextField
           fullWidth
           type="password"
-          label="Contraseña"
+          label="Contraseña *"
           margin="normal"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -81,7 +81,7 @@ const RegisterPage: React.FC = () => {
         <TextField
           fullWidth
           type="password"
-          label="Confirmar Contraseña"
+          label="Confirmar Contraseña *"
           margin="normal"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
