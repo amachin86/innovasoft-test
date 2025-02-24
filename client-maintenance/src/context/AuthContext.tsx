@@ -1,10 +1,19 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { useNavigate } from "react-router-dom";
 
-interface AuthContextType {
-  user: string | null;
-  login: (token: string) => void;
-  logout: () => void;
-}
+// Definir tipo de usuario
+export type User = {
+    id: string;
+    name: string;
+    email: string;
+  };
+  
+  // Contexto de autenticación
+  interface AuthContextType {
+    user: User | null;
+    login: (userData: User) => void;
+    logout: () => void;
+  }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -21,16 +30,18 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<string | null>(localStorage.getItem('token'));
+    const [user, setUser] = React.useState<User | null>(null);
+    //const navigate = useNavigate();
 
-  const login = (token: string) => {
-    localStorage.setItem('token', token);
-    setUser(token);
+  const login = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
     setUser(null);
+    localStorage.removeItem("user");
+    //navigate("/login")
   };
 
   return (
