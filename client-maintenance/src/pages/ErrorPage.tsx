@@ -9,9 +9,10 @@ const ErrorPage: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
-      <Sidebar />
+      
       <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
         <Header />
+        <Sidebar />
         <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center", bgcolor: "#f0f0f0" }}>
         <Container sx={{ mt: 4, textAlign: 'center', alignItems: "center" }}>
                    <Typography variant="h2" color="blue" gutterBottom>

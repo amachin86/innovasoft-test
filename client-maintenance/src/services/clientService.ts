@@ -6,15 +6,6 @@ export interface Client {
     identificacion: string;
     nombre: string;
     apellidos: string;
-    telefonoCelular?: string;
-    otroTelefono?: string;
-    direccion?: string;
-    fNacimiento?: string;
-    fAfiliacion?: string;
-    sexo?: string;
-    resenaPersonal?: string;
-    imagen?: string;
-    interesesId?: string;
 }
 
 // Obtener listado de clientes
