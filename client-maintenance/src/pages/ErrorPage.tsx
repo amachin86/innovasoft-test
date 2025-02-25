@@ -1,11 +1,10 @@
 import React from 'react';
 import { Container, Typography, Box, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 
 const ErrorPage: React.FC = () => {
-  //const navigate = useNavigate();  
+    
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
