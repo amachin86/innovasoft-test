@@ -3,22 +3,26 @@ import { Drawer, List, ListItem, ListItemText, Avatar, Box, Typography, Divider 
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+
+
 const Sidebar: React.FC = () => {
-  const { user } = useAuth();
+  const { user, open } = useAuth();
   const navigate = useNavigate();
 
   return (
     <Drawer
-      variant="permanent"
+    variant="persistent"
+    open={open}
       sx={{
-        width: 240,
+        width: open ? 240 : 0,
         flexShrink: 0,
+        transition: "width 0.3s ease",
         [`& .MuiDrawer-paper`]: {
           width: 240,
           boxSizing: "border-box",
-          bgcolor: "#ffffff",
-          mt: "64px", // Margen superior para no ocupar el Header
-          height: "calc(100vh - 64px)", // Altura ajustada bajo el Header
+          bgcolor: "#ffffff", //
+          mt: "70px", // Margen superior para no ocupar el Header
+          height: "calc(100vh - 60px)", // Altura ajustada bajo el Header
         },
       }}
     >

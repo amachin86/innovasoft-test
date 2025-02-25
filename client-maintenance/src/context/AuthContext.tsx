@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
 // Definir tipo de usuario
@@ -11,8 +11,10 @@ export type User = {
   // Contexto de autenticación
   interface AuthContextType {
     user: User | null;
+    open: boolean;
     login: (userData: User) => void;
     logout: () => void;
+    toggleSidebar: () => void;
   }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,22 +32,35 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [user, setUser] = React.useState<User | null>(null);
-    //const navigate = useNavigate();
+
+  const [user, setUser] = useState<User | null>(null);
+  const [open, setOpen] = useState(true);
+  const navigate = useNavigate();
+
+   // Cargar usuario desde localStorage si existe
+   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(JSON.parse(storedUser));
+  }, []);
+
+  const toggleSidebar = () => {
+    setOpen(!open);
+  };    
 
   const login = (userData: User) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
+    navigate("/home");  // Redirige tras iniciar sesión
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
-    //navigate("/login")
+    navigate("/");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, open, login, logout, toggleSidebar }}>
       {children}
     </AuthContext.Provider>
   );

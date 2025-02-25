@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Checkbox, FormControlLabel, Container, Typography, Box, Alert, InputAdornment, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
+import api from '../services/api';
 
 function LoginPage() {
   const [username, setUsername] = useState('');
@@ -19,7 +20,7 @@ function LoginPage() {
     }
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/Authenticate/login`, {
+      const response = await api.post(`${process.env.REACT_APP_API_BASE_URL}/api/Authenticate/login`, {
         username,
         password,
       });

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box, Alert } from '@mui/material';
 import axios from 'axios';
+import api from '../services/api';
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -30,7 +31,7 @@ const RegisterPage: React.FC = () => {
     }
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/Authenticate/register`, {
+      const response = await api.post(`${process.env.REACT_APP_API_BASE_URL}/api/Authenticate/register`, {
         username,
         email,
         password,

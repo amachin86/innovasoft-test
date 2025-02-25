@@ -1,30 +1,25 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { CssBaseline } from '@mui/material';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Home from './pages/Home';
-import ClientList from './pages/ClientList';
-import ClientForm from './pages/ClientForm';
-import ErrorPage from './pages/ErrorPage';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { CssBaseline } from "@mui/material";
+import { AuthProvider } from "./context/AuthContext";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
+import ClientList from "./pages/ClientList";
+import ClientForm from "./pages/ClientForm";
+import ErrorPage from "./pages/ErrorPage";
+import PrivateRoute from "./components/PrivateRoute";
 
-// Componente de Ruta Protegida
-const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { user } = useAuth();
-    return user ? <>{children}</> : <Navigate to="/" />;
-};
-
-// Aplicación Principal
 const App: React.FC = () => {
     return (
-        <AuthProvider>
-            <CssBaseline />
-            <Router>
+        <Router> {/* El Router debe envolver a AuthProvider */}
+            <AuthProvider>
+                <CssBaseline />
                 <Routes>
                     <Route path="/" element={<Login />} />
-                    <Route path="/register" element={<Register />} />                    
-                    <Route path ="/home" element={<Home />}/>
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/home" element={<Home />} />
+
                     <Route
                         path="/home"
                         element={
@@ -51,8 +46,8 @@ const App: React.FC = () => {
                     />
                     <Route path="*" element={<ErrorPage />} />
                 </Routes>
-            </Router>
-        </AuthProvider>
+            </AuthProvider>
+        </Router>
     );
 };
 
