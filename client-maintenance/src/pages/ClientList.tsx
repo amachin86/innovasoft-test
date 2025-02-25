@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
     Box, Typography, TextField, IconButton, Button, Table, TableBody, TableCell, TableHead, TableRow,
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert, Stack, Paper, Grid
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert, Stack, Paper
 } from "@mui/material";
 import { Search, Add, Edit, Delete, ArrowBack } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
@@ -50,126 +50,128 @@ const ClientsPage: React.FC = () => {
 
     return (
         <Box sx={{ display: "flex", height: "100vh" }}>
-        <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-            <Header />
-            <Sidebar />
+            {/* Sidebar sin ancho fijo */}
+            <Box sx={{ flexShrink: 0 }}>
+                <Sidebar />
+            </Box>
 
-            {/* Contenido principal */}
-            <Box sx={{ p: 3, flexGrow: 1 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-                    <Typography variant="h4">Consulta de Clientes</Typography>
-                    <Stack direction="row" spacing={2}>
-                        <Button
-                            variant="contained"
-                            startIcon={<Add />}
-                            color="primary"
-                            onClick={() => navigate("/client-form")}
-                        >
-                            Agregar Cliente
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            startIcon={<ArrowBack />}
-                            onClick={() => navigate("/home")}
-                        >
-                            Regresar
-                        </Button>
+            <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+                <Header />
+
+                {/* Contenido principal */}
+                <Box sx={{ p: 3, flexGrow: 1 }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+                        <Typography variant="h4">Consulta de Clientes</Typography>
+                        <Stack direction="row" spacing={2}>
+                            <Button
+                                variant="contained"
+                                startIcon={<Add />}
+                                color="primary"
+                                onClick={() => navigate("/client-form")}
+                            >
+                                Agregar Cliente
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                startIcon={<ArrowBack />}
+                                onClick={() => navigate("/home")}
+                            >
+                                Regresar
+                            </Button>
+                        </Stack>
                     </Stack>
-                </Stack>
 
-                {/* Filtros de búsqueda */}
-                <Stack direction="row" spacing={2} alignItems="center" mb={3}>
-                    <TextField
-                        fullWidth
-                        label="Nombre"
-                        variant="outlined"
-                        size="small"
-                        value={filters.nombre}
-                        onChange={(e) => setFilters({ ...filters, nombre: e.target.value })}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Identificación"
-                        variant="outlined"
-                        size="small"
-                        value={filters.identificacion}
-                        onChange={(e) => setFilters({ ...filters, identificacion: e.target.value })}
-                    />
-                    <IconButton 
-                        color="inherit" 
-                        onClick={loadClients} 
-                        sx={{ backgroundColor: 'ButtonFace', '&:hover': { backgroundColor: 'darkgrey' } }}
-                    >
-                        <Search />
-                    </IconButton>
-                </Stack>
+                    {/* Filtros de búsqueda */}
+                    <Stack direction="row" spacing={2} alignItems="center" mb={3}>
+                        <TextField
+                            fullWidth
+                            label="Nombre"
+                            variant="outlined"
+                            size="small"
+                            value={filters.nombre}
+                            onChange={(e) => setFilters({ ...filters, nombre: e.target.value })}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Identificación"
+                            variant="outlined"
+                            size="small"
+                            value={filters.identificacion}
+                            onChange={(e) => setFilters({ ...filters, identificacion: e.target.value })}
+                        />
+                        <IconButton 
+                            color="inherit" 
+                            onClick={loadClients} 
+                            sx={{ backgroundColor: 'ButtonFace', '&:hover': { backgroundColor: 'darkgrey' } }}
+                        >
+                            <Search />
+                        </IconButton>
+                    </Stack>
 
-                {/* Tabla de clientes */}
-                <Paper elevation={3}>
-                    <Table>
-                        <TableHead>
-                            <TableRow sx={{ backgroundColor: "#90caf9" }}>
-                                <TableCell>Identificación</TableCell>
-                                <TableCell>Nombre Completo</TableCell>
-                                <TableCell width={100}>Acciones</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {clients.map((client) => (
-                                <TableRow key={client.id}>
-                                    <TableCell>{client.identificacion}</TableCell>
-                                    <TableCell>{`${client.nombre} ${client.apellidos}`}</TableCell>
-                                    <TableCell>
-                                        <IconButton
-                                            color="primary"
-                                            onClick={() => navigate(`/client-form/${client.id}`)}
-                                        >
-                                            <Edit />
-                                        </IconButton>
-                                        <IconButton
-                                            color="error"
-                                            onClick={() => {
-                                                setSelectedClient(client);
-                                                setOpenDeleteDialog(true);
-                                            }}
-                                        >
-                                            <Delete />
-                                        </IconButton>
-                                    </TableCell>
+                    {/* Tabla de clientes */}
+                    <Paper elevation={3}>
+                        <Table>
+                            <TableHead>
+                                <TableRow sx={{ backgroundColor: "#90caf9" }}>
+                                    <TableCell>Identificación</TableCell>
+                                    <TableCell>Nombre Completo</TableCell>
+                                    <TableCell width={100}>Acciones</TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </Paper>
+                            </TableHead>
+                            <TableBody>
+                                {clients.map((client) => (
+                                    <TableRow key={client.id}>
+                                        <TableCell>{client.identificacion}</TableCell>
+                                        <TableCell>{`${client.nombre} ${client.apellidos}`}</TableCell>
+                                        <TableCell>
+                                            <IconButton
+                                                color="primary"
+                                                onClick={() => navigate(`/client-form/${client.id}`)}
+                                            >
+                                                <Edit />
+                                            </IconButton>
+                                            <IconButton
+                                                color="error"
+                                                onClick={() => {
+                                                    setSelectedClient(client);
+                                                    setOpenDeleteDialog(true);
+                                                }}
+                                            >
+                                                <Delete />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </Paper>
 
-                {/* Modal de confirmación para eliminar */}
-                <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                    <DialogTitle>Eliminar Cliente</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText>
-                            ¿Está seguro de que desea eliminar al cliente{" "}
-                            <strong>{selectedClient?.nombre}</strong>? Esta acción no se puede deshacer.
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => setOpenDeleteDialog(false)}>Cancelar</Button>
-                        <Button onClick={handleDelete} color="error">Eliminar</Button>
-                    </DialogActions>
-                </Dialog>
+                    {/* Modal de confirmación para eliminar */}
+                    <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+                        <DialogTitle>Eliminar Cliente</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                ¿Está seguro de que desea eliminar al cliente{" "}
+                                <strong>{selectedClient?.nombre}</strong>? Esta acción no se puede deshacer.
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setOpenDeleteDialog(false)}>Cancelar</Button>
+                            <Button onClick={handleDelete} color="error">Eliminar</Button>
+                        </DialogActions>
+                    </Dialog>
 
-                {/* Alertas */}
-                <Snackbar
-                    open={alert.open}
-                    autoHideDuration={4000}
-                    onClose={() => setAlert({ ...alert, open: false })}
-                >
-                    <Alert severity={alert.severity as "success" | "error"}>{alert.message}</Alert>
-                </Snackbar>
+                    {/* Alertas */}
+                    <Snackbar
+                        open={alert.open}
+                        autoHideDuration={4000}
+                        onClose={() => setAlert({ ...alert, open: false })}
+                    >
+                        <Alert severity={alert.severity as "success" | "error"}>{alert.message}</Alert>
+                    </Snackbar>
+                </Box>
             </Box>
         </Box>
-    </Box>
-
-    
     );
 };
 
