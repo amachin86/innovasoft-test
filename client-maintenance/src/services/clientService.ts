@@ -100,7 +100,7 @@ export const getClientById = async (id: string) => {
 };
 
 // Crear cliente
-export const createClient = async (clientData: Client) => {
+export const createClient = async (clientData: ClientData) => {
     try {
         const response = await api.post("/api/Cliente/Crear", clientData);
         return response.data;
@@ -113,7 +113,7 @@ export const createClient = async (clientData: Client) => {
 };
 
 // Actualizar cliente
-export const updateClient = async (id: string, clientData: Client) => {
+export const updateClient = async (id: string, clientData: ClientData) => {
     try {
         const response = await api.put(`/api/Cliente/Actualizar/${id}`, clientData);
         return response.data;
