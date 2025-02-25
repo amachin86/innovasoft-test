@@ -29,3 +29,30 @@ export const deleteClient = async (clientId: string) => {
         throw error;
     }
 };
+
+export const registerUser = async (username: string, email: string, password: string,) => {
+    try {
+        const response = await api.post('/api/Authenticate/register', {
+            username,
+            email,
+            password,
+          });
+        return response.data;
+    } catch (error) {
+        console.error("Error al registrar el usuario:", error);
+        throw error;
+    }
+};
+
+export const loginUser = async (username: string, password: string,) => {
+    try {
+        const response = await api.post('/api/Authenticate/login', {
+            username,
+            password,
+          });
+        return response.data;
+    } catch (error) {
+        console.error("Error en login", error);
+        throw error;
+    }
+};

@@ -101,7 +101,7 @@ const ClientsPage: React.FC = () => {
                             />
                         </Grid>
                         <Grid item sx={{ textAlign: "center" }}>
-                            <IconButton color="primary" onClick={loadClients}>
+                            <IconButton color="inherit" onClick={loadClients} >
                                 <Search />
                             </IconButton>
                         </Grid>
