@@ -10,7 +10,7 @@ const Sidebar: React.FC = () => {
 
   return (    
       <Drawer
-        variant="temporary" // Cambiar a 'temporary' para un comportamiento responsive
+        variant="persistent" // Cambiar a 'temporary' para un comportamiento responsive
         open={open}
         onClose={toggleSidebar} // Cerrar el Drawer al hacer clic fuera
         sx={{

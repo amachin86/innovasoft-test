@@ -1,4 +1,5 @@
 import api from "./api"; // Axios configurado con baseURL y token
+import dayjs, { Dayjs } from "dayjs";
 
 // Interfaz del cliente
 export interface Client {
@@ -15,13 +16,13 @@ export interface ClientData {
     nombre: string;
     apellidos: string;
     telefonoCelular: string;
-    otroTelefono?: string;
+    otroTelefono?: string; // Opcional
     direccion: string;
-    fNacimiento: string;
-    fAfiliacion: string;
+    fNacimiento: Date; // Cambiado a Date
+    fAfiliacion: Date; // Cambiado a Date
     sexo: string;
-    resenaPersonal?: string;
-    imagen?: string;
+    resenaPersonal?: string; // Opcional
+    imagen?: string; // Opcional
     interesesId: string;
 }
 

@@ -4,9 +4,6 @@ import { ExitToApp, Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-mate
 import { useAuth } from "../context/AuthContext";
 
 
-
-
-
 const Header: React.FC = () => {
   const {  user, open, logout, toggleSidebar } = useAuth();
   
@@ -16,7 +13,8 @@ const Header: React.FC = () => {
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
         <IconButton color="inherit" onClick={toggleSidebar}>
-            {open ? <CloseIcon /> : <MenuIcon />}
+            {/*open ? <CloseIcon /> : <MenuIcon />*/}
+            <MenuIcon />
           </IconButton>
           <Typography variant="h6" sx={{ ml: 2 }}>
             COMPAÑIA PRUEBA
