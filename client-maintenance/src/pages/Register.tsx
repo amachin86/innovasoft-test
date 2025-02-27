@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box, Alert } from '@mui/material';
-import { registerUser } from "../services/clientService";
+import { registerUser, CustomError } from "../services/clientService";
 
 
 const RegisterPage: React.FC = () => {
@@ -19,10 +19,17 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
+     // Expresión regular para validar el formato del correo electrónico
+     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+     if (!emailRegex.test(email)) {
+      setError('Correo electrónico inválido.');
+      return;
+     }
+
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
-    }
+    }    
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,20}$/;
     if (!passwordRegex.test(password)) {
@@ -31,16 +38,21 @@ const RegisterPage: React.FC = () => {
     }
 
     try {
-      const response = await registerUser(username, email, password);     
+      const response = await registerUser(username, email, password);       
 
       if (response.data.status === 'Success') {
         setSuccess('Usuario creado correctamente. Redirigiendo a inicio de sesión...');
         setTimeout(() => navigate('/'), 3000);
       } else {
         setError(response.data.message || 'Error al registrar el usuario.');
+        console.log("Axios response :" + response);
       }
-    } catch (error) {
-      setError('Hubo un problema con el registro. Inténtelo nuevamente.');
+    } catch (error: unknown) {
+      if (error instanceof CustomError) {
+          const handlerError = error as CustomError;
+          setError(handlerError.message);
+      }
+      else setError('Hubo un problema con el registro. Inténtelo nuevamente.');     
     }
   };
 

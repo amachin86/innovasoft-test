@@ -2,6 +2,12 @@ import api from "./api"; // Axios configurado con baseURL y token
 import axios from 'axios';
 
 var base_url = "https://pruebareactjs.test-class.com/Api";
+export class CustomError extends Error {
+    statusCode = 500;
+    constructor(message: string) {
+      super(message);      
+    }
+  }
 
 // Interfaz del cliente
 export interface Client {
@@ -51,26 +57,45 @@ export const deleteClient = async (clientId: string) => {
 };
 
 export const registerUser = async (username: string, email: string, password: string,) => {
-    try {
+    
         const response = await axios.post( base_url +'/api/Authenticate/register', {
             username,
             email,
             password,
+          }).then(function(response): any {
+            console.log(response);
+            return response;
+          })
+          .catch(function (error) {           
+            if (error.response) {
+              // La respuesta fue hecha y el servidor respondió con un código de estado
+              // que esta fuera del rango de 2xx
+              console.log(error.response.data);
+              console.log(error.response.status);
+              throw new CustomError(error.response.data.message);
+              //console.log(error.response.headers);
+            } else if (error.request) {
+              // La petición fue hecha pero no se recibió respuesta
+              // `error.request` es una instancia de XMLHttpRequest en el navegador y una instancia de
+              // http.ClientRequest en node.js
+              console.log(error.request);              
+            } else {
+              // Algo paso al preparar la petición que lanzo un Error
+              console.log('Error', error.message);              
+            }
+            console.log(error.config);
           });
-        return response.data;
-    } catch (error) {
-        console.error("Error al registrar el usuario:", error);
-        throw error;
-    }
+        return response;
 };
 
-export const loginUser = async (username: string, password: string,) => {
+export const loginUser = async (username: string, password: string) => {
     try {
         const response = await axios.post(base_url + '/api/Authenticate/login', {
             username,
             password,
           });
-        return response.data;
+        console.log(response);
+        return response;
     } catch (error) {
         console.error("Error en login", error);
         throw error;

@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 // Definir tipo de usuario
 export type User = {
     id: string;
-    name: string;
-    email: string;
+    name: string;   
   };
   
   // Contexto de autenticación
