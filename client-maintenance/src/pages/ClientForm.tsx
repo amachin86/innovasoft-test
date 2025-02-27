@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-    Box, TextField, Button, MenuItem, Typography, Stack, Avatar, Snackbar, Alert, Divider
+    Box, TextField, Button, MenuItem, Typography, Stack, Avatar, Snackbar, Alert, Divider, CircularProgress
 } from "@mui/material";
 import { Save, ArrowBack } from "@mui/icons-material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -27,6 +27,7 @@ const ClientFormPage: React.FC = () => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [alert, setAlert] = useState({ open: false, message: "", severity: "success" });
     const [errors, setErrors] = useState<any>({});
+    const [loading, setLoading] = useState(true); // Estado para el loading
 
     const {
         control,
@@ -52,6 +53,7 @@ const ClientFormPage: React.FC = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true); // Iniciar loading
             try {
                 const interestsData = await getInterests();
                 setInterests(interestsData);
@@ -65,6 +67,8 @@ const ClientFormPage: React.FC = () => {
                 }
             } catch (error) {
                 setAlert({ open: true, message: "Error al cargar la información.", severity: "error" });
+            } finally {
+                setLoading(false); // Finalizar loading
             }
         };
 
@@ -198,237 +202,245 @@ const ClientFormPage: React.FC = () => {
                                 }}
                             >
 
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                                    <Stack direction="row" alignItems="center" spacing={1}>
-                                        <input
-                                            type="file"
-                                            hidden
-                                            accept="image/*"
-                                            onChange={handleImageChange}
-                                            id="image-upload"
-                                        />
-                                        <label htmlFor="image-upload">
-                                            <Avatar
-                                                src={imagePreview ?? ""}
-                                                sx={{ width: 100, height: 100, cursor: 'pointer' }}
-                                            />
-                                        </label>
-                                        <Typography variant="h4">Mantenimiento de Clientes</Typography>
-                                    </Stack>
+                                {loading ? ( // Mostrar loading si está cargando
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px' }}>
+                                        <CircularProgress />
+                                    </Box>
+                                ) : (
+                                    <>
+                                        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                                            <Stack direction="row" alignItems="center" spacing={1}>
+                                                <input
+                                                    type="file"
+                                                    hidden
+                                                    accept="image/*"
+                                                    onChange={handleImageChange}
+                                                    id="image-upload"
+                                                />
+                                                <label htmlFor="image-upload">
+                                                    <Avatar
+                                                        src={imagePreview ?? ""}
+                                                        sx={{ width: 100, height: 100, cursor: 'pointer' }}
+                                                    />
+                                                </label>
+                                                <Typography variant="h4">Mantenimiento de Clientes</Typography>
+                                            </Stack>
 
-                                    <Stack direction="row" spacing={2}>
-                                        <Button
-                                            variant="outlined"
-                                            startIcon={<ArrowBack />}
-                                            onClick={() => navigate("/clients")}
+                                            <Stack direction="row" spacing={2}>
+                                                <Button
+                                                    variant="outlined"
+                                                    startIcon={<ArrowBack />}
+                                                    onClick={() => navigate("/clients")}
+                                                >
+                                                    Regresar
+                                                </Button>
+
+                                                <Button
+                                                    variant="contained"
+                                                    startIcon={<Save />}
+                                                    type="submit"
+                                                    disabled={!isValid}
+                                                    onClick={handleSubmit(onSubmit)}
+                                                >
+                                                    {id ? "Actualizar" : "Guardar"}
+                                                </Button>
+                                            </Stack>
+                                        </Stack>
+
+                                        <Divider sx={{ my: 2 }} />
+
+                                        <Stack spacing={3} component="form">
+                                            <Stack spacing={2}>
+                                                {/* Primer grupo de campos */}
+                                                <Stack direction="row" spacing={2}>
+                                                    <Controller
+                                                        name="identificacion"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Identificación *"
+                                                                {...field}
+                                                                error={!!errors.identificacion}
+                                                                helperText={errors.identificacion}
+                                                            />
+                                                        )}
+                                                    />
+                                                    <Controller
+                                                        name="nombre"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Nombre *"
+                                                                {...field}
+                                                                error={!!errors.nombre}
+                                                                helperText={errors.nombre}
+                                                            />
+                                                        )}
+                                                    />
+                                                    <Controller
+                                                        name="apellidos"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Apellidos *"
+                                                                {...field}
+                                                                error={!!errors.apellidos}
+                                                                helperText={errors.apellidos}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Stack>
+
+                                                {/* Segundo grupo de campos */}
+                                                <Stack direction="row" spacing={2}>
+                                                    <Controller
+                                                        name="telefonoCelular"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Teléfono Celular *"
+                                                                {...field}
+                                                                error={!!errors.telefonoCelular}
+                                                                helperText={errors.telefonoCelular}
+                                                            />
+                                                        )}
+                                                    />
+                                                    <Controller
+                                                        name="otroTelefono"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                fullWidth
+                                                                label="Otro Teléfono"
+                                                                {...field}
+                                                                error={!!errors.otroTelefono}
+                                                                helperText={errors.otroTelefono}
+                                                            />
+                                                        )}
+                                                    />
+                                                    <Controller
+                                                        name="sexo"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                fullWidth
+                                                                select
+                                                                label="Género *"
+                                                                {...field}
+                                                                error={!!errors.sexo}
+                                                                helperText={errors.sexo}
+                                                            >
+                                                                <MenuItem value="M">Masculino</MenuItem>
+                                                                <MenuItem value="F">Femenino</MenuItem>
+                                                            </TextField>
+                                                        )}
+                                                    />
+                                                </Stack>
+
+                                                {/* Tercer grupo de campos */}
+                                                <Stack direction="row" spacing={2}>
+                                                    <Controller
+                                                        name="fNacimiento"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <DatePicker
+                                                                label="Fecha de Nacimiento *"
+                                                                value={field.value ? dayjs(field.value) : null}
+                                                                onChange={(date: Dayjs | null) => field.onChange(date?.toDate())}
+                                                            />
+                                                        )}
+                                                    />
+                                                    {errors.fNacimiento && (
+                                                        <Typography color="error" variant="body2">
+                                                            {errors.fNacimiento}
+                                                        </Typography>
+                                                    )}
+
+                                                    <Controller
+                                                        name="fAfiliacion"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <DatePicker
+                                                                label="Fecha de Afiliación *"
+                                                                value={field.value ? dayjs(field.value) : null}
+                                                                onChange={(date: Dayjs | null) => field.onChange(date?.toDate())}
+                                                            />
+                                                        )}
+                                                    />
+                                                    {errors.fAfiliacion && (
+                                                        <Typography color="error" variant="body2">
+                                                            {errors.fAfiliacion}
+                                                        </Typography>
+                                                    )}
+
+                                                    <Controller
+                                                        name="interesesId"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <TextField
+                                                                fullWidth
+                                                                select
+                                                                label="Intereses *"
+                                                                {...field}
+                                                                error={!!errors.interesesId}
+                                                                helperText={errors.interesesId}
+                                                            >
+                                                                {interests.map((interest) => (
+                                                                    <MenuItem key={interest.id} value={interest.id}>
+                                                                        {interest.nombre}
+                                                                    </MenuItem>
+                                                                ))}
+                                                            </TextField>
+                                                        )}
+                                                    />
+                                                </Stack>
+                                            </Stack>
+
+                                            {/* Campos de Dirección y Reseña Personal */}
+                                            <Controller
+                                                name="direccion"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <TextField
+                                                        fullWidth
+                                                        label="Dirección *"
+                                                        {...field}
+                                                        error={!!errors.direccion}
+                                                        helperText={errors.direccion}
+                                                    />
+                                                )}
+                                            />
+
+                                            <Controller
+                                                name="resenaPersonal"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <TextField
+                                                        fullWidth
+                                                        multiline
+                                                        rows={3}
+                                                        label="Reseña Personal"
+                                                        {...field}
+                                                        error={!!errors.resenaPersonal}
+                                                        helperText={errors.resenaPersonal}
+                                                    />
+                                                )}
+                                            />
+                                        </Stack>
+
+                                        <Snackbar
+                                            open={alert.open}
+                                            autoHideDuration={4000}
+                                            onClose={() => setAlert({ ...alert, open: false })}
                                         >
-                                            Regresar
-                                        </Button>
-
-                                        <Button
-                                            variant="contained"
-                                            startIcon={<Save />}
-                                            type="submit"
-                                            disabled={!isValid}
-                                            onClick={handleSubmit(onSubmit)}
-                                        >
-                                            {id ? "Actualizar" : "Guardar"}
-                                        </Button>
-                                    </Stack>
-                                </Stack>
-
-                                <Divider sx={{ my: 2 }} />
-
-                                <Stack spacing={3} component="form">
-                                    <Stack spacing={2}>
-                                        {/* Primer grupo de campos */}
-                                        <Stack direction="row" spacing={2}>
-                                            <Controller
-                                                name="identificacion"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <TextField
-                                                        fullWidth
-                                                        label="Identificación *"
-                                                        {...field}
-                                                        error={!!errors.identificacion}
-                                                        helperText={errors.identificacion}
-                                                    />
-                                                )}
-                                            />
-                                            <Controller
-                                                name="nombre"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <TextField
-                                                        fullWidth
-                                                        label="Nombre *"
-                                                        {...field}
-                                                        error={!!errors.nombre}
-                                                        helperText={errors.nombre}
-                                                    />
-                                                )}
-                                            />
-                                            <Controller
-                                                name="apellidos"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <TextField
-                                                        fullWidth
-                                                        label="Apellidos *"
-                                                        {...field}
-                                                        error={!!errors.apellidos}
-                                                        helperText={errors.apellidos}
-                                                    />
-                                                )}
-                                            />
-                                        </Stack>
-
-                                        {/* Segundo grupo de campos */}
-                                        <Stack direction="row" spacing={2}>
-                                            <Controller
-                                                name="telefonoCelular"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <TextField
-                                                        fullWidth
-                                                        label="Teléfono Celular *"
-                                                        {...field}
-                                                        error={!!errors.telefonoCelular}
-                                                        helperText={errors.telefonoCelular}
-                                                    />
-                                                )}
-                                            />
-                                            <Controller
-                                                name="otroTelefono"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <TextField
-                                                        fullWidth
-                                                        label="Otro Teléfono"
-                                                        {...field}
-                                                        error={!!errors.otroTelefono}
-                                                        helperText={errors.otroTelefono}
-                                                    />
-                                                )}
-                                            />
-                                            <Controller
-                                                name="sexo"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <TextField
-                                                        fullWidth
-                                                        select
-                                                        label="Género *"
-                                                        {...field}
-                                                        error={!!errors.sexo}
-                                                        helperText={errors.sexo}
-                                                    >
-                                                        <MenuItem value="M">Masculino</MenuItem>
-                                                        <MenuItem value="F">Femenino</MenuItem>
-                                                    </TextField>
-                                                )}
-                                            />
-                                        </Stack>
-
-                                        {/* Tercer grupo de campos */}
-                                        <Stack direction="row" spacing={2}>
-                                            <Controller
-                                                name="fNacimiento"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <DatePicker
-                                                        label="Fecha de Nacimiento *"
-                                                        value={field.value ? dayjs(field.value) : null}
-                                                        onChange={(date: Dayjs | null) => field.onChange(date?.toDate())}
-                                                    />
-                                                )}
-                                            />
-                                            {errors.fNacimiento && (
-                                                <Typography color="error" variant="body2">
-                                                    {errors.fNacimiento}
-                                                </Typography>
-                                            )}
-
-                                            <Controller
-                                                name="fAfiliacion"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <DatePicker
-                                                        label="Fecha de Afiliación *"
-                                                        value={field.value ? dayjs(field.value) : null}
-                                                        onChange={(date: Dayjs | null) => field.onChange(date?.toDate())}
-                                                    />
-                                                )}
-                                            />
-                                            {errors.fAfiliacion && (
-                                                <Typography color="error" variant="body2">
-                                                    {errors.fAfiliacion}
-                                                </Typography>
-                                            )}
-
-                                            <Controller
-                                                name="interesesId"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <TextField
-                                                        fullWidth
-                                                        select
-                                                        label="Intereses *"
-                                                        {...field}
-                                                        error={!!errors.interesesId}
-                                                        helperText={errors.interesesId}
-                                                    >
-                                                        {interests.map((interest) => (
-                                                            <MenuItem key={interest.id} value={interest.id}>
-                                                                {interest.nombre}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </TextField>
-                                                )}
-                                            />
-                                        </Stack>
-                                    </Stack>
-
-                                    {/* Campos de Dirección y Reseña Personal */}
-                                    <Controller
-                                        name="direccion"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <TextField
-                                                fullWidth
-                                                label="Dirección *"
-                                                {...field}
-                                                error={!!errors.direccion}
-                                                helperText={errors.direccion}
-                                            />
-                                        )}
-                                    />
-
-                                    <Controller
-                                        name="resenaPersonal"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <TextField
-                                                fullWidth
-                                                multiline
-                                                rows={3}
-                                                label="Reseña Personal"
-                                                {...field}
-                                                error={!!errors.resenaPersonal}
-                                                helperText={errors.resenaPersonal}
-                                            />
-                                        )}
-                                    />
-                                </Stack>
-
-                                <Snackbar
-                                    open={alert.open}
-                                    autoHideDuration={4000}
-                                    onClose={() => setAlert({ ...alert, open: false })}
-                                >
-                                    <Alert severity={alert.severity as "success" | "error"}>{alert.message}</Alert>
-                                </Snackbar>
+                                            <Alert severity={alert.severity as "success" | "error"}>{alert.message}</Alert>
+                                        </Snackbar>
+                                    </>
+                                )}
                             </Box>
                         </Box>
                     </main>
