@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import {
-    Box, TextField, Button, MenuItem, Typography, Stack, Avatar, Snackbar, Alert, Divider, IconButton
+    Box, TextField, Button, MenuItem, Typography, Stack, Avatar, Snackbar, Alert, Divider
 } from "@mui/material";
-import { Save, ArrowBack, Person } from "@mui/icons-material";
+import { Save, ArrowBack } from "@mui/icons-material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useNavigate, useParams } from "react-router-dom";
@@ -30,12 +30,10 @@ const ClientFormPage: React.FC = () => {
 
     const {
         control,
-        register,
         handleSubmit,
         setValue,
         formState: { isValid },
     } = useForm<ClientData>({
-        mode: "onChange",
         defaultValues: {
             identificacion: "",
             nombre: "",
@@ -88,8 +86,68 @@ const ClientFormPage: React.FC = () => {
 
     const validateFields = (data: ClientData) => {
         const newErrors: any = {};
-        // Validación de campos (similar a la anterior)
-        // ...
+        
+        // Validación de campos
+        if (!data.identificacion) {
+            newErrors.identificacion = "La identificación es obligatoria.";
+        } else if (!/^\d+$/.test(data.identificacion)) {
+            newErrors.identificacion = "La identificación solo debe contener números.";
+        } else if (data.identificacion.length < 8 || data.identificacion.length > 15) {
+            newErrors.identificacion = "La identificación debe tener entre 8 y 15 dígitos.";
+        }
+
+        if (!data.nombre) {
+            newErrors.nombre = "El nombre es obligatorio.";
+        } else if (data.nombre.length < 3 || data.nombre.length > 50) {
+            newErrors.nombre = "El nombre debe tener entre 3 y 50 caracteres.";
+        }
+
+        if (!data.apellidos) {
+            newErrors.apellidos = "Los apellidos son obligatorios.";
+        } else if (data.apellidos.length < 3 || data.apellidos.length > 50) {
+            newErrors.apellidos = "Los apellidos deben tener entre 3 y 50 caracteres.";
+        }
+
+        if (!data.telefonoCelular) {
+            newErrors.telefonoCelular = "El teléfono celular es obligatorio.";
+        } else if (!/^\d{8,15}$/.test(data.telefonoCelular)) {
+            newErrors.telefonoCelular = "El número de teléfono debe tener entre 8 y 15 dígitos.";
+        }
+
+        if (data.otroTelefono && !/^\d{8,15}$/.test(data.otroTelefono)) {
+            newErrors.otroTelefono = "El número debe tener entre 8 y 15 dígitos.";
+        }
+
+        if (!data.direccion) {
+            newErrors.direccion = "La dirección es obligatoria.";
+        } else if (data.direccion.length < 10) {
+            newErrors.direccion = "La dirección debe tener al menos 10 caracteres.";
+        }
+
+        if (!data.fNacimiento) {
+            newErrors.fNacimiento = "La fecha de nacimiento es obligatoria.";
+        } else if (dayjs(data.fNacimiento).isAfter(dayjs())) {
+            newErrors.fNacimiento = "La fecha de nacimiento no puede ser futura.";
+        }
+
+        if (!data.fAfiliacion) {
+            newErrors.fAfiliacion = "La fecha de afiliación es obligatoria.";
+        }
+
+        if (!data.sexo) {
+            newErrors.sexo = "Debe seleccionar un género.";
+        } else if (!["M", "F"].includes(data.sexo)) {
+            newErrors.sexo = "El género debe ser Masculino (M) o Femenino (F).";
+        }
+
+        if (!data.interesesId) {
+            newErrors.interesesId = "Debe seleccionar un interés.";
+        }
+
+        if (data.resenaPersonal && data.resenaPersonal.length > 500) {
+            newErrors.resenaPersonal = "La reseña no puede exceder 500 caracteres.";
+        }
+
         return newErrors;
     };
 
@@ -185,56 +243,92 @@ const ClientFormPage: React.FC = () => {
                                     <Stack spacing={2}>
                                         {/* Primer grupo de campos */}
                                         <Stack direction="row" spacing={2}>
-                                            <TextField
-                                                fullWidth
-                                                label="Identificación *"
-                                                {...register("identificacion")}
-                                                error={!!errors.identificacion}
-                                                helperText={errors.identificacion}
+                                            <Controller
+                                                name="identificacion"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <TextField
+                                                        fullWidth
+                                                        label="Identificación *"
+                                                        {...field}
+                                                        error={!!errors.identificacion}
+                                                        helperText={errors.identificacion}
+                                                    />
+                                                )}
                                             />
-                                            <TextField
-                                                fullWidth
-                                                label="Nombre *"
-                                                {...register("nombre")}
-                                                error={!!errors.nombre}
-                                                helperText={errors.nombre}
+                                            <Controller
+                                                name="nombre"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <TextField
+                                                        fullWidth
+                                                        label="Nombre *"
+                                                        {...field}
+                                                        error={!!errors.nombre}
+                                                        helperText={errors.nombre}
+                                                    />
+                                                )}
                                             />
-                                            <TextField
-                                                fullWidth
-                                                label="Apellidos *"
-                                                {...register("apellidos")}
-                                                error={!!errors.apellidos}
-                                                helperText={errors.apellidos}
+                                            <Controller
+                                                name="apellidos"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <TextField
+                                                        fullWidth
+                                                        label="Apellidos *"
+                                                        {...field}
+                                                        error={!!errors.apellidos}
+                                                        helperText={errors.apellidos}
+                                                    />
+                                                )}
                                             />
                                         </Stack>
 
                                         {/* Segundo grupo de campos */}
                                         <Stack direction="row" spacing={2}>
-                                            <TextField
-                                                fullWidth
-                                                label="Teléfono Celular *"
-                                                {...register("telefonoCelular")}
-                                                error={!!errors.telefonoCelular}
-                                                helperText={errors.telefonoCelular}
+                                            <Controller
+                                                name="telefonoCelular"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <TextField
+                                                        fullWidth
+                                                        label="Teléfono Celular *"
+                                                        {...field}
+                                                        error={!!errors.telefonoCelular}
+                                                        helperText={errors.telefonoCelular}
+                                                    />
+                                                )}
                                             />
-                                            <TextField
-                                                fullWidth
-                                                label="Otro Teléfono"
-                                                {...register("otroTelefono")}
-                                                error={!!errors.otroTelefono}
-                                                helperText={errors.otroTelefono}
+                                            <Controller
+                                                name="otroTelefono"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <TextField
+                                                        fullWidth
+                                                        label="Otro Teléfono"
+                                                        {...field}
+                                                        error={!!errors.otroTelefono}
+                                                        helperText={errors.otroTelefono}
+                                                    />
+                                                )}
                                             />
-                                            <TextField
-                                                fullWidth
-                                                select
-                                                label="Género *"
-                                                {...register("sexo")}
-                                                error={!!errors.sexo}
-                                                helperText={errors.sexo}
-                                            >
-                                                <MenuItem value="M">Masculino</MenuItem>
-                                                <MenuItem value="F">Femenino</MenuItem>
-                                            </TextField>
+                                            <Controller
+                                                name="sexo"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <TextField
+                                                        fullWidth
+                                                        select
+                                                        label="Género *"
+                                                        {...field}
+                                                        error={!!errors.sexo}
+                                                        helperText={errors.sexo}
+                                                    >
+                                                        <MenuItem value="M">Masculino</MenuItem>
+                                                        <MenuItem value="F">Femenino</MenuItem>
+                                                    </TextField>
+                                                )}
+                                            />
                                         </Stack>
 
                                         {/* Tercer grupo de campos */}
@@ -273,40 +367,58 @@ const ClientFormPage: React.FC = () => {
                                                 </Typography>
                                             )}
 
-                                            <TextField
-                                                fullWidth
-                                                select
-                                                label="Intereses *"
-                                                {...register("interesesId")}
-                                                error={!!errors.interesesId}
-                                                helperText={errors.interesesId}
-                                            >
-                                                {interests.map((interest) => (
-                                                    <MenuItem key={interest.id} value={interest.id}>
-                                                        {interest.nombre}
-                                                    </MenuItem>
-                                                ))}
-                                            </TextField>
+                                            <Controller
+                                                name="interesesId"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <TextField
+                                                        fullWidth
+                                                        select
+                                                        label="Intereses *"
+                                                        {...field}
+                                                        error={!!errors.interesesId}
+                                                        helperText={errors.interesesId}
+                                                    >
+                                                        {interests.map((interest) => (
+                                                            <MenuItem key={interest.id} value={interest.id}>
+                                                                {interest.nombre}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </TextField>
+                                                )}
+                                            />
                                         </Stack>
                                     </Stack>
 
                                     {/* Campos de Dirección y Reseña Personal */}
-                                    <TextField
-                                        fullWidth
-                                        label="Dirección *"
-                                        {...register("direccion")}
-                                        error={!!errors.direccion}
-                                        helperText={errors.direccion}
+                                    <Controller
+                                        name="direccion"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <TextField
+                                                fullWidth
+                                                label="Dirección *"
+                                                {...field}
+                                                error={!!errors.direccion}
+                                                helperText={errors.direccion}
+                                            />
+                                        )}
                                     />
 
-                                    <TextField
-                                        fullWidth
-                                        multiline
-                                        rows={3}
-                                        label="Reseña Personal"
-                                        {...register("resenaPersonal")}
-                                        error={!!errors.resenaPersonal}
-                                        helperText={errors.resenaPersonal}
+                                    <Controller
+                                        name="resenaPersonal"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <TextField
+                                                fullWidth
+                                                multiline
+                                                rows={3}
+                                                label="Reseña Personal"
+                                                {...field}
+                                                error={!!errors.resenaPersonal}
+                                                helperText={errors.resenaPersonal}
+                                            />
+                                        )}
                                     />
                                 </Stack>
 
@@ -327,5 +439,3 @@ const ClientFormPage: React.FC = () => {
 };
 
 export default ClientFormPage;
-
-//pass Prueba2025

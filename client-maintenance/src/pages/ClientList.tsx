@@ -129,7 +129,7 @@ const ClientsPage: React.FC = () => {
                                     <TableRow sx={{ backgroundColor: "#90caf9" }}>
                                         <TableCell>Identificación</TableCell>
                                         <TableCell>Nombre Completo</TableCell>
-                                        <TableCell width={100}>Acciones</TableCell>
+                                        <TableCell width={150}>Acciones</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>

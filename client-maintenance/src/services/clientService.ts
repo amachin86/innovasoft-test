@@ -38,6 +38,7 @@ export interface ClientData {
 export const getClients = async (filters: { identificacion?: string; nombre?: string; usuarioId: string }) => {
     try {
         const response = await api.post<Client[]>("/api/Cliente/Listado", filters);
+        console.log(filters);
         return response.data;
     } catch (error) {
         console.error("Error al obtener clientes:", error);
