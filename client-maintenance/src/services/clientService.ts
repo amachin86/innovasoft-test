@@ -1,5 +1,7 @@
 import api from "./api"; // Axios configurado con baseURL y token
-import dayjs, { Dayjs } from "dayjs";
+import axios from 'axios';
+
+var base_url = "https://pruebareactjs.test-class.com/Api";
 
 // Interfaz del cliente
 export interface Client {
@@ -50,7 +52,7 @@ export const deleteClient = async (clientId: string) => {
 
 export const registerUser = async (username: string, email: string, password: string,) => {
     try {
-        const response = await api.post('/api/Authenticate/register', {
+        const response = await axios.post( base_url +'/api/Authenticate/register', {
             username,
             email,
             password,
@@ -64,7 +66,7 @@ export const registerUser = async (username: string, email: string, password: st
 
 export const loginUser = async (username: string, password: string,) => {
     try {
-        const response = await api.post('/api/Authenticate/login', {
+        const response = await axios.post(base_url + '/api/Authenticate/login', {
             username,
             password,
           });
