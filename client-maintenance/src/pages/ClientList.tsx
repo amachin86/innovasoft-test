@@ -4,7 +4,7 @@ import {
     Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Alert, Stack, Paper,
     CircularProgress, Pagination
 } from "@mui/material";
-import { Search, Add, Edit, Delete, ArrowBack } from "@mui/icons-material";
+import { Search, Add, Edit, Delete, ArrowBack, ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
 import { getClients, deleteClient, Client } from "../services/clientService";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,7 @@ const ClientsPage: React.FC = () => {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-    const [sortColumn, setSortColumn] = useState<keyof Client>('identificacion'); // Cambiado a keyof Client
+    const [sortColumn, setSortColumn] = useState<keyof Client>('identificacion');
 
     const loadClients = async () => {
         setLoading(true);
@@ -68,7 +68,7 @@ const ClientsPage: React.FC = () => {
         setFilters(tempFilters);
     };
 
-    const handleSort = (column: keyof Client) => { // Cambiado a keyof Client
+    const handleSort = (column: keyof Client) => {
         const newSortDirection = sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
         setSortDirection(newSortDirection);
         setSortColumn(column);
@@ -170,9 +170,11 @@ const ClientsPage: React.FC = () => {
                                                             <TableRow sx={{ backgroundColor: "#90caf9" }}>
                                                                 <TableCell onClick={() => handleSort('identificacion')} style={{ cursor: 'pointer' }}>
                                                                     Identificación
+                                                                    {sortColumn === 'identificacion' && (sortDirection === 'asc' ? <ArrowUpward fontSize="small" /> : <ArrowDownward fontSize="small" />)}
                                                                 </TableCell>
                                                                 <TableCell onClick={() => handleSort('nombre')} style={{ cursor: 'pointer' }}>
                                                                     Nombre Completo
+                                                                    {sortColumn === 'nombre' && (sortDirection === 'asc' ? <ArrowUpward fontSize="small" /> : <ArrowDownward fontSize="small" />)}
                                                                 </TableCell>
                                                                 <TableCell width={150}>Acciones</TableCell>
                                                             </TableRow>
