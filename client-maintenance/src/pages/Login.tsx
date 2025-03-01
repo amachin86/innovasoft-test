@@ -11,6 +11,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(''); // Estado para el mensaje de éxito
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
@@ -36,16 +37,20 @@ function LoginPage() {
 
       localStorage.setItem('token', token);
       localStorage.setItem('userid', userid);
-      //localStorage.setItem('user', username);
-
 
       if (rememberMe) {
         localStorage.setItem('username', username);
       } else {
         localStorage.removeItem('username'); // Eliminar el nombre de usuario si no se recuerda
       }
-       login({id: userid, name: username});
-      //navigate('/home');
+      
+      setSuccess('Inicio de sesión exitoso. Redirigiendo...'); // Mensaje de éxito            
+
+      // Redirigir después de un breve retraso
+      setTimeout(() => {
+        login({ id: userid, name: username }); // Cambia '/home' a la ruta deseada
+      }, 2000); // 2 segundos de retraso
+
     } catch (error) {
       setError('Credenciales inválidas. Verifique su usuario y contraseña.');
     }
@@ -59,6 +64,7 @@ function LoginPage() {
             Iniciar Sesión
           </Typography>
           {error && <Alert severity="error">{error}</Alert>}
+          {success && <Alert severity="success">{success}</Alert>} {/* Mostrar mensaje de éxito */}
           <TextField
             fullWidth
             label="Usuario *"

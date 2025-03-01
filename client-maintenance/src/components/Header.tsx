@@ -1,5 +1,5 @@
 import React from "react";
-import { AppBar, Toolbar, Typography, Button, Box, IconButton } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Box, IconButton, Tooltip } from "@mui/material";
 import { ExitToApp, Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
 
@@ -22,7 +22,9 @@ const Header: React.FC = () => {
         </Box>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography sx={{ mr: 2 }}>{user?.name || "Nombre de Usuario"}</Typography>
-          <Button color="inherit" startIcon={<ExitToApp />} onClick={logout} />      
+          <Tooltip title="Cerrar Sesión" arrow>
+          <Button color="inherit" startIcon={<ExitToApp />} onClick={logout} />  
+          </Tooltip>    
           
         </Box>
       </Toolbar>
