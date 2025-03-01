@@ -16,15 +16,16 @@ const ClientsPage: React.FC = () => {
     const navigate = useNavigate();
     const [clients, setClients] = useState<Client[]>([]);
     const [filters, setFilters] = useState({ nombre: "", identificacion: "" });
-    const [tempFilters, setTempFilters] = useState({ nombre: "", identificacion: "" }); // Estado temporal para filtros
+    const [tempFilters, setTempFilters] = useState({ nombre: "", identificacion: "" });
     const [selectedClient, setSelectedClient] = useState<Client | null>(null);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [alert, setAlert] = useState({ open: false, message: "", severity: "success" });
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [sortColumn, setSortColumn] = useState<keyof Client>('identificacion'); // Cambiado a keyof Client
 
-    // Cargar clientes
     const loadClients = async () => {
         setLoading(true);
         try {
@@ -41,7 +42,6 @@ const ClientsPage: React.FC = () => {
         loadClients();
     }, [filters]);
 
-    // Eliminar cliente
     const handleDelete = async () => {
         if (!selectedClient) return;
         try {
@@ -56,19 +56,29 @@ const ClientsPage: React.FC = () => {
         }
     };
 
-    // Manejar cambio de página
     const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
     };
 
-    // Calcular clientes a mostrar en la página actual
     const startIndex = (page - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     const paginatedClients = clients.slice(startIndex, endIndex);
 
-    // Aplicar filtros al hacer clic en el botón de búsqueda
     const applyFilters = () => {
         setFilters(tempFilters);
+    };
+
+    const handleSort = (column: keyof Client) => { // Cambiado a keyof Client
+        const newSortDirection = sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
+        setSortDirection(newSortDirection);
+        setSortColumn(column);
+
+        const sortedClients = [...clients].sort((a, b) => {
+            if (a[column] < b[column]) return newSortDirection === 'asc' ? -1 : 1;
+            if (a[column] > b[column]) return newSortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+        setClients(sortedClients);
     };
 
     return (
@@ -116,7 +126,6 @@ const ClientsPage: React.FC = () => {
                                     </Stack>
                                 </Stack>
 
-                                {/* Filtros de búsqueda */}
                                 <Stack direction="row" spacing={2} alignItems="center" mb={3}>
                                     <TextField
                                         fullWidth
@@ -143,64 +152,72 @@ const ClientsPage: React.FC = () => {
                                     </IconButton>
                                 </Stack>
 
-                                {/* Indicador de carga */}
                                 {loading ? (
                                     <Box display="flex" justifyContent="center" alignItems="center" height="100%">
                                         <CircularProgress />
                                     </Box>
                                 ) : (
                                     <>
-                                        {/* Tabla de clientes */}
-                                        <Paper elevation={3}>
-                                            <Table>
-                                                <TableHead>
-                                                    <TableRow sx={{ backgroundColor: "#90caf9" }}>
-                                                        <TableCell>Identificación</TableCell>
-                                                        <TableCell>Nombre Completo</TableCell>
-                                                        <TableCell width={150}>Acciones</TableCell>
-                                                    </TableRow>
-                                                </TableHead>
-                                                <TableBody>
-                                                    {paginatedClients.map((client) => (
-                                                        <TableRow key={client.id}>
-                                                            <TableCell>{client.identificacion}</TableCell>
-                                                            <TableCell>{`${client.nombre} ${client.apellidos}`}</TableCell>
-                                                            <TableCell>
-                                                                <IconButton
-                                                                    color="primary"
-                                                                    onClick={() => navigate(`/client-form/${client.id}`)}
-                                                                >
-                                                                    <Edit />
-                                                                </IconButton>
-                                                                <IconButton
-                                                                    color="error"
-                                                                    onClick={() => {
-                                                                        setSelectedClient(client);
-                                                                        setOpenDeleteDialog(true);
-                                                                    }}
-                                                                >
-                                                                    <Delete />
-                                                                </IconButton>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))}
-                                                </TableBody>
-                                            </Table>
-                                        </Paper>
+                                        {clients.length === 0 ? (
+                                            <Typography variant="h6" color="textSecondary" align="center">
+                                                No hay clientes disponibles.
+                                            </Typography>
+                                        ) : (
+                                            <>
+                                                <Paper elevation={3}>
+                                                    <Table>
+                                                        <TableHead>
+                                                            <TableRow sx={{ backgroundColor: "#90caf9" }}>
+                                                                <TableCell onClick={() => handleSort('identificacion')} style={{ cursor: 'pointer' }}>
+                                                                    Identificación
+                                                                </TableCell>
+                                                                <TableCell onClick={() => handleSort('nombre')} style={{ cursor: 'pointer' }}>
+                                                                    Nombre Completo
+                                                                </TableCell>
+                                                                <TableCell width={150}>Acciones</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {paginatedClients.map((client) => (
+                                                                <TableRow key={client.id} sx={{ '&:hover': { backgroundColor: '#e1f5fe' } }}>
+                                                                    <TableCell>{client.identificacion}</TableCell>
+                                                                    <TableCell>{`${client.nombre} ${client.apellidos}`}</TableCell>
+                                                                    <TableCell>
+                                                                        <IconButton
+                                                                            color="primary"
+                                                                            onClick={() => navigate(`/client-form/${client.id}`)}
+                                                                        >
+                                                                            <Edit />
+                                                                        </IconButton>
+                                                                        <IconButton
+                                                                            color="error"
+                                                                            onClick={() => {
+                                                                                setSelectedClient(client);
+                                                                                setOpenDeleteDialog(true);
+                                                                            }}
+                                                                        >
+                                                                            <Delete />
+                                                                        </IconButton>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </Paper>
 
-                                        {/* Paginación */}
-                                        <Pagination
-                                            count={Math.ceil(clients.length / rowsPerPage)}
-                                            page={page}
-                                            onChange={handleChangePage}
-                                            variant="outlined"
-                                            shape="rounded"
-                                            sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}
-                                        />
+                                                <Pagination
+                                                    count={Math.ceil(clients.length / rowsPerPage)}
+                                                    page={page}
+                                                    onChange={handleChangePage}
+                                                    variant="outlined"
+                                                    shape="rounded"
+                                                    sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}
+                                                />
+                                            </>
+                                        )}
                                     </>
                                 )}
 
-                                {/* Modal de confirmación para eliminar */}
                                 <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
                                     <DialogTitle>Eliminar Cliente</DialogTitle>
                                     <DialogContent>
@@ -215,7 +232,6 @@ const ClientsPage: React.FC = () => {
                                     </DialogActions>
                                 </Dialog>
 
-                                {/* Alertas */}
                                 <Snackbar
                                     open={alert.open}
                                     autoHideDuration={4000}

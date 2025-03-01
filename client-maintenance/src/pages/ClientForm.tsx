@@ -6,7 +6,7 @@ import { Save, ArrowBack } from "@mui/icons-material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useNavigate, useParams } from "react-router-dom";
-import { createClient, updateClient, getClientById, getInterests, ClientData } from "../services/clientService";
+import { createClient, updateClient, getClientById, getInterests, ClientData, ClientCreate, createClientTest } from "../services/clientService";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import dayjs, { Dayjs } from "dayjs";
@@ -16,17 +16,17 @@ import { useAuth } from "../context/AuthContext";
 // Interfaz de Intereses
 interface Interest {
     id: string;
-    nombre: string;
+    descripcion: string;
 }
 
 const ClientFormPage: React.FC = () => {
-    const { open } = useAuth();
+    const { open, user } = useAuth();
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
     const [interests, setInterests] = useState<Interest[]>([]);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [alert, setAlert] = useState({ open: false, message: "", severity: "success" });
-    const [errors, setErrors] = useState<any>({});
+    const [errors, setErrors] = useState<{ [key: string]: string | undefined }>({});
     const [loading, setLoading] = useState(true); // Estado para el loading
 
     const {
@@ -35,19 +35,21 @@ const ClientFormPage: React.FC = () => {
         setValue,
         formState: { isValid },
     } = useForm<ClientData>({
-        defaultValues: {
+        defaultValues: { 
+            //id: id ? id : "",           
             identificacion: "",
             nombre: "",
             apellidos: "",
             telefonoCelular: "",
             otroTelefono: "",
             direccion: "",
-            fNacimiento: new Date(),
-            fAfiliacion: new Date(),
+            fNacimiento: dayjs().format("YYYY-MM-DD"),
+            fAfiliacion: dayjs().format("YYYY-MM-DD"),
             sexo: "",
             resenaPersonal: "",
             imagen: "",
             interesesId: "",
+            usuarioId: user?.id,
         },
     });
 
@@ -64,6 +66,7 @@ const ClientFormPage: React.FC = () => {
                         setValue(key as keyof ClientData, (clientData as any)[key]);
                     });
                     if (clientData.imagen) setImagePreview(clientData.imagen);
+
                 }
             } catch (error) {
                 setAlert({ open: true, message: "Error al cargar la información.", severity: "error" });
@@ -87,6 +90,27 @@ const ClientFormPage: React.FC = () => {
             reader.readAsDataURL(file);
         }
     };
+
+    const getClienteInfo = (data: ClientData) => {
+        const client: ClientCreate =
+        {
+            identificacion: data.identificacion,
+            nombre: data.nombre,
+            apellidos: data.apellidos,
+            celular: data.telefonoCelular,
+            otroTelefono: data.otroTelefono,
+            direccion: data.direccion,
+            fNacimiento: data.fNacimiento,
+            fAfiliacion: data.fAfiliacion,
+            sexo: data.sexo,
+            resenaPersonal: data.resenaPersonal,
+            imagen: data.imagen,
+            interesesId: data.interesesId,
+            usuarioId: data.usuarioId,           
+        }
+
+        return client;
+    }
 
     const validateFields = (data: ClientData) => {
         const newErrors: any = {};
@@ -117,8 +141,9 @@ const ClientFormPage: React.FC = () => {
         } else if (!/^\d{8,15}$/.test(data.telefonoCelular)) {
             newErrors.telefonoCelular = "El número de teléfono debe tener entre 8 y 15 dígitos.";
         }
-
-        if (data.otroTelefono && !/^\d{8,15}$/.test(data.otroTelefono)) {
+        if (!data.otroTelefono){
+            newErrors.otroTelefono= "El otro teléfono es obligatorio.";
+        }else if (!/^\d{8,15}$/.test(data.otroTelefono)) {            
             newErrors.otroTelefono = "El número debe tener entre 8 y 15 dígitos.";
         }
 
@@ -135,7 +160,9 @@ const ClientFormPage: React.FC = () => {
         }
 
         if (!data.fAfiliacion) {
-            newErrors.fAfiliacion = "La fecha de afiliación es obligatoria.";
+            newErrors.fAfiliacion = "La fecha de afiliación es obligatoria.";        
+        }else if (dayjs(data.fAfiliacion).isBefore(dayjs(data.fNacimiento))){
+            newErrors.fAfiliacion = "La fecha de afiliación no puede ser antes de la fecha de nacimiento."; 
         }
 
         if (!data.sexo) {
@@ -147,12 +174,20 @@ const ClientFormPage: React.FC = () => {
         if (!data.interesesId) {
             newErrors.interesesId = "Debe seleccionar un interés.";
         }
-
-        if (data.resenaPersonal && data.resenaPersonal.length > 500) {
+        if (!data.resenaPersonal) {
+            newErrors.resenaPersonal = "La reseña es obligatoria.";  
+        }else if (data.resenaPersonal && data.resenaPersonal.length > 500) {
             newErrors.resenaPersonal = "La reseña no puede exceder 500 caracteres.";
         }
 
         return newErrors;
+    };
+
+    const handleInputChange = (fieldName: string) => {
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [fieldName]: undefined, // Eliminar el error del campo que se está editando
+        }));
     };
 
     const onSubmit = async (data: ClientData) => {
@@ -163,11 +198,16 @@ const ClientFormPage: React.FC = () => {
         }
 
         try {
-            if (id) {
-                await updateClient(id, data);
+            const cliente = getClienteInfo(data);
+            if (id) {   
+                cliente.id = id;             
+                await updateClient(cliente);
                 setAlert({ open: true, message: "Cliente actualizado correctamente.", severity: "success" });
             } else {
-                await createClient(data);
+                
+                await createClient(cliente); 
+               // let response = await createClientTest(cliente); 
+               // console.log(response);              
                 setAlert({ open: true, message: "Cliente creado correctamente.", severity: "success" });
             }
             setTimeout(() => navigate("/clients"), 2000);
@@ -227,13 +267,6 @@ const ClientFormPage: React.FC = () => {
                                             </Stack>
 
                                             <Stack direction="row" spacing={2}>
-                                                <Button
-                                                    variant="outlined"
-                                                    startIcon={<ArrowBack />}
-                                                    onClick={() => navigate("/clients")}
-                                                >
-                                                    Regresar
-                                                </Button>
 
                                                 <Button
                                                     variant="contained"
@@ -244,6 +277,14 @@ const ClientFormPage: React.FC = () => {
                                                 >
                                                     {id ? "Actualizar" : "Guardar"}
                                                 </Button>
+
+                                                <Button
+                                                    variant="outlined"
+                                                    startIcon={<ArrowBack />}
+                                                    onClick={() => navigate("/clients")}
+                                                >
+                                                    Regresar
+                                                </Button>                                               
                                             </Stack>
                                         </Stack>
 
@@ -263,6 +304,10 @@ const ClientFormPage: React.FC = () => {
                                                                 {...field}
                                                                 error={!!errors.identificacion}
                                                                 helperText={errors.identificacion}
+                                                                onChange={(e) => {
+                                                                    field.onChange(e); // Actualiza el valor del campo
+                                                                    handleInputChange("identificacion"); // Limpia el error
+                                                                }}
                                                             />
                                                         )}
                                                     />
@@ -276,6 +321,10 @@ const ClientFormPage: React.FC = () => {
                                                                 {...field}
                                                                 error={!!errors.nombre}
                                                                 helperText={errors.nombre}
+                                                                onChange={(e) => {
+                                                                    field.onChange(e); // Actualiza el valor del campo
+                                                                    handleInputChange("nombre"); // Limpia el error
+                                                                }}
                                                             />
                                                         )}
                                                     />
@@ -289,6 +338,10 @@ const ClientFormPage: React.FC = () => {
                                                                 {...field}
                                                                 error={!!errors.apellidos}
                                                                 helperText={errors.apellidos}
+                                                                onChange={(e) => {
+                                                                    field.onChange(e); // Actualiza el valor del campo
+                                                                    handleInputChange("apellidos"); // Limpia el error
+                                                                }}
                                                             />
                                                         )}
                                                     />
@@ -306,6 +359,10 @@ const ClientFormPage: React.FC = () => {
                                                                 {...field}
                                                                 error={!!errors.telefonoCelular}
                                                                 helperText={errors.telefonoCelular}
+                                                                onChange={(e) => {
+                                                                    field.onChange(e); // Actualiza el valor del campo
+                                                                    handleInputChange("telefonoCelular"); // Limpia el error
+                                                                }}
                                                             />
                                                         )}
                                                     />
@@ -315,10 +372,14 @@ const ClientFormPage: React.FC = () => {
                                                         render={({ field }) => (
                                                             <TextField
                                                                 fullWidth
-                                                                label="Otro Teléfono"
+                                                                label="Otro Teléfono *"
                                                                 {...field}
                                                                 error={!!errors.otroTelefono}
                                                                 helperText={errors.otroTelefono}
+                                                                onChange={(e) => {
+                                                                    field.onChange(e); // Actualiza el valor del campo
+                                                                    handleInputChange("otroTelefono"); // Limpia el error
+                                                                }}
                                                             />
                                                         )}
                                                     />
@@ -333,6 +394,10 @@ const ClientFormPage: React.FC = () => {
                                                                 {...field}
                                                                 error={!!errors.sexo}
                                                                 helperText={errors.sexo}
+                                                                onChange={(e) => {
+                                                                    field.onChange(e); // Actualiza el valor del campo
+                                                                    handleInputChange("sexo"); // Limpia el error
+                                                                }}
                                                             >
                                                                 <MenuItem value="M">Masculino</MenuItem>
                                                                 <MenuItem value="F">Femenino</MenuItem>
@@ -388,15 +453,19 @@ const ClientFormPage: React.FC = () => {
                                                                 {...field}
                                                                 error={!!errors.interesesId}
                                                                 helperText={errors.interesesId}
+                                                                onChange={(e) => {
+                                                                    field.onChange(e); // Actualiza el valor del campo
+                                                                    handleInputChange("interesesId"); // Limpia el error
+                                                                }}
                                                             >
                                                                 {interests.map((interest) => (
                                                                     <MenuItem key={interest.id} value={interest.id}>
-                                                                        {interest.nombre}
+                                                                        {interest.descripcion}
                                                                     </MenuItem>
                                                                 ))}
                                                             </TextField>
                                                         )}
-                                                    />
+                                                    />                                                   
                                                 </Stack>
                                             </Stack>
 
@@ -411,6 +480,10 @@ const ClientFormPage: React.FC = () => {
                                                         {...field}
                                                         error={!!errors.direccion}
                                                         helperText={errors.direccion}
+                                                        onChange={(e) => {
+                                                            field.onChange(e); // Actualiza el valor del campo
+                                                            handleInputChange("direccion"); // Limpia el error
+                                                        }}
                                                     />
                                                 )}
                                             />
@@ -423,10 +496,14 @@ const ClientFormPage: React.FC = () => {
                                                         fullWidth
                                                         multiline
                                                         rows={3}
-                                                        label="Reseña Personal"
+                                                        label="Reseña Personal *"
                                                         {...field}
                                                         error={!!errors.resenaPersonal}
                                                         helperText={errors.resenaPersonal}
+                                                        onChange={(e) => {
+                                                            field.onChange(e); // Actualiza el valor del campo
+                                                            handleInputChange("resenaPersonal"); // Limpia el error
+                                                        }}
                                                     />
                                                 )}
                                             />

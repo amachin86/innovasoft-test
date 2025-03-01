@@ -17,10 +17,7 @@ const App: React.FC = () => {
                 <CssBaseline />
                 <Routes>
                     <Route path="/" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/home" element={<Home />} />
-                    <Route path="/clients" element={<ClientList />} />
-                    <Route path="//client-form/:id?" element={<ClientForm />} />
+                    <Route path="/register" element={<Register />} />                    
 
                     <Route
                         path="/home"

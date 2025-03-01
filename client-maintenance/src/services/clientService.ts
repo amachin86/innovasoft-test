@@ -24,14 +24,32 @@ export interface ClientData {
     nombre: string;
     apellidos: string;
     telefonoCelular: string;
-    otroTelefono?: string; // Opcional
+    otroTelefono: string; 
     direccion: string;
-    fNacimiento: Date; // Cambiado a Date
-    fAfiliacion: Date; // Cambiado a Date
+    fNacimiento: string; 
+    fAfiliacion: string; 
     sexo: string;
-    resenaPersonal?: string; // Opcional
+    resenaPersonal: string; 
     imagen?: string; // Opcional
     interesesId: string;
+    usuarioId: string;
+}
+
+export interface ClientCreate {
+    id?: string;    
+    identificacion: string;
+    nombre: string;
+    apellidos: string;
+    celular: string;
+    otroTelefono: string; 
+    direccion: string;
+    fNacimiento: string; 
+    fAfiliacion: string; 
+    sexo: string;
+    resenaPersonal: string; 
+    imagen?: string; // Opcional
+    interesesId: string;
+    usuarioId: string;
 }
 
 // Obtener listado de clientes
@@ -129,8 +147,10 @@ export const getClientById = async (id: string) => {
 };
 
 // Crear cliente
-export const createClient = async (clientData: ClientData) => {
+export const createClient = async (clientData: ClientCreate) => {
     try {
+        console.log(clientData);
+
         const response = await api.post("/api/Cliente/Crear", clientData);
         return response.data;
         
@@ -142,9 +162,23 @@ export const createClient = async (clientData: ClientData) => {
 };
 
 // Actualizar cliente
-export const updateClient = async (id: string, clientData: ClientData) => {
+export const updateClient = async (clientData: ClientCreate) => {
+
+   /* const token = localStorage.getItem('token');
+    
+    const axiosAPI = axios.create({
+        baseURL: base_url, // Cambia esto por la URL base de tu API
+        headers: {
+            'Content-Type': 'application/json', // Tipo de contenido
+            'Accept': 'application/json', // Aceptar respuesta en formato JSON
+            'Authorization': `Bearer ${token}`,  
+            'User-Agent': 'PostmanRuntime/7.43.0', // Simula el User-Agent de Postman
+            // Agrega otros encabezados que necesites
+        }
+    });*/
+    console.log(clientData);
     try {
-        const response = await api.put(`/api/Cliente/Actualizar/${id}`, clientData);
+        const response = await api.post(`/api/Cliente/Actualizar`, clientData);///api/Cliente/Actualizar/${id}
         return response.data;
         
     } catch (error) {
@@ -152,5 +186,47 @@ export const updateClient = async (id: string, clientData: ClientData) => {
         throw error;
         
     }   
+};
+
+export const createClientTest = async (clientData: ClientCreate) => {
+    
+        let data = JSON.stringify({
+        "nombre": "Prueba",
+        "apellidos": "Test API",
+        "identificacion": "0009865-op",
+        "celular": "85757575775",
+        "otroTelefono": "84847477474664",
+        "direccion": "direccion de prueba",
+        "fNacimiento": "2025-02-28T10:45:49.652Z",
+        "fAfiliacion": "2025-02-28T10:45:49.652Z",
+        "sexo": "M",
+        "resennaPersonal": "Probar API",
+        "imagen": "string",
+        "interesFK": "bca7ed8f-ee04-483b-bde6-2a7c186276fc",
+        "usuarioId": "770096bd-6cae-41f8-a591-3a7368402dc4"
+        });
+        
+        const token = localStorage.getItem('token');
+        let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://pruebareactjs.test-class.com/Api/api/Cliente/Crear',
+        headers: { 
+            'Content-Type': 'application/json', 
+            'Authorization': `Bearer ${token}`,             
+        },
+        data : clientData
+        };
+
+        axios.request(config)
+        .then(function (response): any {
+        console.log(JSON.stringify(response.data));
+        return response.data;
+        })
+        .catch(function (error) {
+        console.log(error);
+        throw error;
+        });
+
 };
 
