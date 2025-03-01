@@ -24,6 +24,14 @@ function LoginPage() {
     }
   }, []);
 
+  // Función para limpiar el error al escribir en los campos
+    const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setter(e.target.value);
+      if (error) {
+        setError(''); // Limpiar el error al escribir
+      }
+    };
+
   const handleLogin = async () => {
     if (!username || !password) {
       setError('El usuario y la contraseña son obligatorios.');
@@ -70,7 +78,7 @@ function LoginPage() {
             label="Usuario *"
             margin="normal"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={handleInputChange(setUsername)}
           />
           <TextField
             fullWidth
@@ -78,7 +86,7 @@ function LoginPage() {
             margin="normal"
             type={showPassword ? 'text' : 'password'}
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handleInputChange(setPassword)}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
