@@ -6,7 +6,9 @@ import { Save, ArrowBack } from "@mui/icons-material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useNavigate, useParams } from "react-router-dom";
-import { createClient, updateClient, getClientById, getInterests, ClientData, ClientCreate, createClientTest } from "../services/clientService";
+import { createClient, updateClient, getClientById, getInterests, createClientTest } from "../services/clientService";
+import { getClienteInfo } from "../services/utilityService";
+import { ClientData, ClientCreate } from "../Interfaces/clienteInterface";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import dayjs, { Dayjs } from "dayjs";
@@ -91,26 +93,7 @@ const ClientFormPage: React.FC = () => {
         }
     };
 
-    const getClienteInfo = (data: ClientData) => {
-        const client: ClientCreate =
-        {
-            identificacion: data.identificacion,
-            nombre: data.nombre,
-            apellidos: data.apellidos,
-            celular: data.telefonoCelular,
-            otroTelefono: data.otroTelefono,
-            direccion: data.direccion,
-            fNacimiento: data.fNacimiento,
-            fAfiliacion: data.fAfiliacion,
-            sexo: data.sexo,
-            resenaPersonal: data.resenaPersonal,
-            imagen: data.imagen,
-            interesesId: data.interesesId,
-            usuarioId: data.usuarioId,           
-        }
-
-        return client;
-    }
+   
 
     const validateFields = (data: ClientData) => {
         const newErrors: any = {};

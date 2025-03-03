@@ -6,7 +6,8 @@ import {
 } from "@mui/material";
 import { Search, Add, Edit, Delete, ArrowBack, ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
-import { getClients, deleteClient, Client } from "../services/clientService";
+import { getClients, deleteClient} from "../services/clientService";
+import { Client } from "../Interfaces/clienteInterface";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
