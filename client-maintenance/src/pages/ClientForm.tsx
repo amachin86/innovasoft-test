@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
 import {
-    Box, TextField, Button, MenuItem, Typography, Stack, Avatar, Snackbar, Alert, Divider, CircularProgress
+    Box, TextField, Button, MenuItem, Typography, Stack, Snackbar, Alert, Divider, CircularProgress
 } from "@mui/material";
 import { Save, ArrowBack } from "@mui/icons-material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useNavigate, useParams } from "react-router-dom";
-import { createClient, updateClient, getClientById, getInterests, createClientTest } from "../services/clientService";
+import { createClient, updateClient, getClientById, getInterests } from "../services/clientService";
 import { getClienteInfo } from "../services/utilityService";
-import { ClientData, ClientCreate } from "../Interfaces/clienteInterface";
+import { ClientData } from "../Interfaces/clienteInterface";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import dayjs, { Dayjs } from "dayjs";
 import { useForm, Controller } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
+import ImageUploader from "../components/ImageUploader"; // Importa el nuevo componente
 
 // Interfaz de Intereses
 interface Interest {
@@ -26,10 +27,10 @@ const ClientFormPage: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
     const [interests, setInterests] = useState<Interest[]>([]);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [alert, setAlert] = useState({ open: false, message: "", severity: "success" });
     const [errors, setErrors] = useState<{ [key: string]: string | undefined }>({});
     const [loading, setLoading] = useState(true); // Estado para el loading
+    const [imagePreview, setImagePreview] = useState<string | null>(null); // Mueve el estado aquí
 
     const {
         control,
@@ -38,7 +39,6 @@ const ClientFormPage: React.FC = () => {
         formState: { isValid },
     } = useForm<ClientData>({
         defaultValues: { 
-            //id: id ? id : "",           
             identificacion: "",
             nombre: "",
             apellidos: "",
@@ -68,7 +68,6 @@ const ClientFormPage: React.FC = () => {
                         setValue(key as keyof ClientData, (clientData as any)[key]);
                     });
                     if (clientData.imagen) setImagePreview(clientData.imagen);
-
                 }
             } catch (error) {
                 setAlert({ open: true, message: "Error al cargar la información.", severity: "error" });
@@ -80,20 +79,10 @@ const ClientFormPage: React.FC = () => {
         fetchData();
     }, [id, setValue]);
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64String = reader.result?.toString();
-                setValue("imagen", base64String ?? "");
-                setImagePreview(base64String ?? "");
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-   
+    const handleImageChange = (base64String: string) => {
+        setValue("imagen", base64String);
+        setImagePreview(base64String);
+    };   
 
     const validateFields = (data: ClientData) => {
         const newErrors: any = {};
@@ -201,77 +190,67 @@ const ClientFormPage: React.FC = () => {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box sx={{ display: "flex", height: "100vh" }}>
-                <Sidebar />
-                <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-                    <Header />
+        <Box sx={{ display: "flex", height: "100vh" }}>
+            <Sidebar />
+            <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+                <Header />
 
-                    <main
-                        style={{
-                            flexGrow: 1,
-                            padding: '16px',
-                            transition: 'margin 0.3s',
-                            marginLeft: open ? 240 : 0,
-                        }}
-                    >
+                <main
+                    style={{
+                        flexGrow: 1,
+                        padding: '16px',
+                        transition: 'margin 0.3s',
+                        marginLeft: open ? 240 : 0,
+                    }}
+                >
 
-                        <Box sx={{ p: 3 }}>
-                            <Box
-                                sx={{
-                                    borderRadius: 2,
-                                    boxShadow: 3,
-                                    backgroundColor: "white",
-                                    p: 3,
-                                }}
-                            >
+                    <Box sx={{ p: 3 }}>
+                        <Box
+                            sx={{
+                                borderRadius: 2,
+                                boxShadow: 3,
+                                backgroundColor: "white",
+                                p: 3,
+                            }}
+                        >
 
-                                {loading ? ( // Mostrar loading si está cargando
-                                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px' }}>
-                                        <CircularProgress />
-                                    </Box>
-                                ) : (
-                                    <>
-                                        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                                            <Stack direction="row" alignItems="center" spacing={1}>
-                                                <input
-                                                    type="file"
-                                                    hidden
-                                                    accept="image/*"
-                                                    onChange={handleImageChange}
-                                                    id="image-upload"
-                                                />
-                                                <label htmlFor="image-upload">
-                                                    <Avatar
-                                                        src={imagePreview ?? ""}
-                                                        sx={{ width: 100, height: 100, cursor: 'pointer' }}
-                                                    />
-                                                </label>
-                                                <Typography variant="h4">Mantenimiento de Clientes</Typography>
-                                            </Stack>
-
-                                            <Stack direction="row" spacing={2}>
-
-                                                <Button
-                                                    variant="contained"
-                                                    startIcon={<Save />}
-                                                    type="submit"
-                                                    disabled={!isValid}
-                                                    onClick={handleSubmit(onSubmit)}
-                                                >
-                                                    {id ? "Actualizar" : "Guardar"}
-                                                </Button>
-
-                                                <Button
-                                                    variant="outlined"
-                                                    startIcon={<ArrowBack />}
-                                                    onClick={() => navigate("/clients")}
-                                                >
-                                                    Regresar
-                                                </Button>                                               
-                                            </Stack>
+                            {loading ? ( // Mostrar loading si está cargando
+                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px' }}>
+                                    <CircularProgress />
+                                </Box>
+                            ) : (
+                                <>
+                                    <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                                        <Stack direction="row" alignItems="center" spacing={1}>
+                                            <ImageUploader 
+                                                onImageChange={handleImageChange} 
+                                                imagePreview={imagePreview} 
+                                            />
+                                            <Typography variant="h4">Mantenimiento de Clientes</Typography>
                                         </Stack>
 
-                                        <Divider sx={{ my: 2 }} />
+                                        <Stack direction="row" spacing={2}>
+                                            <Button
+                                                variant="contained"
+                                                startIcon={<Save />}
+                                                type="submit"
+                                                disabled={!isValid}
+                                                onClick={handleSubmit(onSubmit)}
+                                            >
+                                                {id ? "Actualizar" : "Guardar"}
+                                            </Button>
+
+                                            <Button
+                                                variant="outlined"
+                                                startIcon={<ArrowBack />}
+                                                onClick={() => navigate("/clients")}
+                                            >
+                                                Regresar
+                                            </Button>                                               
+                                        </Stack>
+                                    </Stack>
+
+                                    <Divider sx={{ my: 2 }} />
 
                                         <Stack spacing={3} component="form">
                                             <Stack spacing={2}>
