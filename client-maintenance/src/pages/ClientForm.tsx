@@ -376,6 +376,7 @@ const ClientFormPage: React.FC = () => {
                                                         render={({ field }) => (
                                                             <DatePicker
                                                                 label="Fecha de Nacimiento *"
+                                                                slotProps={{textField: {fullWidth: true}}}
                                                                 value={field.value ? dayjs(field.value) : null}
                                                                 onChange={(date: Dayjs | null) => field.onChange(date?.toDate())}
                                                             />
@@ -393,6 +394,7 @@ const ClientFormPage: React.FC = () => {
                                                         render={({ field }) => (
                                                             <DatePicker
                                                                 label="Fecha de Afiliación *"
+                                                                slotProps={{textField: {fullWidth: true}}}
                                                                 value={field.value ? dayjs(field.value) : null}
                                                                 onChange={(date: Dayjs | null) => field.onChange(date?.toDate())}
                                                             />
