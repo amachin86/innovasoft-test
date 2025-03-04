@@ -40,8 +40,8 @@ El usuario debe iniciar sesión o registrarse para acceder a la aplicación.
 Se almacena la sesión en el contexto `AuthContext`.
 
 ### 🔹 Gestión de Clientes
-Desde `ClientsPage.tsx`, se pueden buscar, editar, eliminar y agregar clientes.  
-`ClientFormPage.tsx` permite crear o actualizar clientes con validaciones manuales.  
+Desde `ClientList.tsx`, se pueden buscar, editar, eliminar y agregar clientes.  
+`ClientForm.tsx` permite crear o actualizar clientes con validaciones manuales.  
 Se usa Avatar para la carga y previsualización de imágenes en Base64.
 
 ### 🔹 Rutas Protegidas
@@ -49,7 +49,7 @@ Solo usuarios autenticados pueden acceder a las páginas de clientes.
 Se usa `PrivateRoute.tsx` para bloquear accesos no autorizados.
 
 ## ❗ Validaciones en Formularios
-- 🔹 Sin Yup, con reglas manuales en `ClientFormPage.tsx`.
+- 🔹 Sin Yup, con reglas manuales en `ClientForm.tsx`.
 - 🔹 Se valida que todos los campos obligatorios sean completados.
 - 🔹 El botón Guardar se deshabilita hasta que el formulario esté válido.
 
